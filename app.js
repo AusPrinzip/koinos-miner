@@ -1,20 +1,32 @@
 'use strict';
 
-const { program } = require('commander');
+// const { program } = require('commander');
+require('dotenv').config()
 
-program
-   .version('1.0.0', '-v, --version')
-   .usage('[OPTIONS]...')
-   .requiredOption('-a, --addr <addr>', 'An ethereum address')
-   .option('-e, --endpoint <endpoint>', 'An ethereum endpoint', 'wss://ropsten-rpc.linkpool.io/ws')
-   .option('-t, --tip <percent>', 'The percentage of mined coins to tip the developers', '5')
-   .option('-p, --proof-period <seconds>', 'How often you want to submit a proof on average', '86400')
-   .option('-k, --key-file <file>', 'AES encrypted file containing private key')
-   .option('-m, --gas-multiplier <multiplier>', 'The multiplier to apply to the recommended gas price', '1')
-   .option('-l, --gas-price-limit <limit>', 'The maximum amount of gas to be spent on a proof submission', '1000000000000')
-   .option('--import', 'Import a private key')
-   .option('--export', 'Export a private key')
-   .parse(process.argv);
+// program
+//    .version('1.0.0', '-v, --version')
+//    .usage('[OPTIONS]...')
+//    .requiredOption('-a, --addr <addr>', 'An ethereum address')
+//    .option('-e, --endpoint <endpoint>', 'An ethereum endpoint', 'wss://ropsten-rpc.linkpool.io/ws')
+//    .option('-t, --tip <percent>', 'The percentage of mined coins to tip the developers', '5')
+//    .option('-p, --proof-period <seconds>', 'How often you want to submit a proof on average', '86400')
+//    .option('-k, --key-file <file>', 'AES encrypted file containing private key')
+//    .option('-m, --gas-multiplier <multiplier>', 'The multiplier to apply to the recommended gas price', '1')
+//    .option('-l, --gas-price-limit <limit>', 'The maximum amount of gas to be spent on a proof submission', '1000000000000')
+//    .option('--import', 'Import a private key')
+//    .option('--export', 'Export a private key')
+//    .parse(process.argv);
+
+
+const addr = process.env.ADDRESS;
+const endpoint = process.env.ENDPOINT;
+const tip = process.env.TIP;
+const proofPeriod = process.env.PROOFPERIOD;
+// const hashrate = process.env.hashrate;
+const keyFile = process.env.KEYFILE;
+const pass = process.env.PASS;
+
+if (!proofPeriod || !addr || !endpoint || !keyFile || !pass || !tip) throw new Error('missing env var');
 
 console.log(` _  __     _                   __  __ _`);
 console.log(`| |/ /    (_)                 |  \\/  (_)`);
@@ -24,10 +36,10 @@ console.log(`| . \\ (_) | | | | | (_) \\__ \\ | |  | | | | | |  __/ |`);
 console.log(`|_|\\_\\___/|_|_| |_|\\___/|___/ |_|  |_|_|_| |_|\\___|_|`);
 console.log(``);
 console.log(`[JS](app.js) Mining with the following arguments:`);
-console.log(`[JS](app.js) Ethereum Address: ${program.addr}`);
-console.log(`[JS](app.js) Ethereum Endpoint: ${program.endpoint}`);
-console.log(`[JS](app.js) Developer Tip: ${program.tip}%`);
-console.log(`[JS](app.js) Proof Period: ${program.proofPeriod}`);
+console.log(`[JS](app.js) Ethereum Address: ${addr}`);
+console.log(`[JS](app.js) Ethereum Endpoint: ${endpoint}`);
+console.log(`[JS](app.js) Developer Tip: ${tip}%`);
+console.log(`[JS](app.js) Proof Period: ${proofPeriod}`);
 console.log(``);
 
 let KoinosMiner = require('.');
@@ -62,7 +74,7 @@ const contract_address = '0xa18c8756ee6B303190A702e81324C72C0E7080c5';
 
 var account;
 
-var w3 = new Web3(program.endpoint);
+var w3 = new Web3(endpoint);
 
 let warningCallback = function(warning) {
    console.log(`[JS](app.js) Warning: `, warning);
@@ -124,72 +136,46 @@ function decrypt(cipherText, password)
    return decrypted
 }
 
-if (program.import)
+// if (import)
+// {
+//    account = w3.eth.accounts.privateKeyToAccount(
+//       readlineSync.questionNewPassword('Enter private key: ', {
+//          mask: '',
+//          min: 64,
+//          max: 66,
+//          charlist: '$<0-9>$<A-F>$<a-f>x'
+//    }));
+
+//    if(readlineSync.keyInYNStrict('Do you want to store your private key encrypted on disk?'))
+//    {
+//       var cipherText = encrypt(account.privateKey, pass);
+
+//       var filename = readlineSync.question('Where do you want to save the encrypted private key? ');
+//       fs.writeFileSync(filename, cipherText);
+//    }
+
+//    console.log('Imported Ethereum address: ' + account.address);
+// }
+if (keyFile)
 {
-   account = w3.eth.accounts.privateKeyToAccount(
-      readlineSync.questionNewPassword('Enter private key: ', {
-         mask: '',
-         min: 64,
-         max: 66,
-         charlist: '$<0-9>$<A-F>$<a-f>x'
-   }));
 
-   if(readlineSync.keyInYNStrict('Do you want to store your private key encrypted on disk?'))
-   {
-      var cipherText = encrypt(account.privateKey, enterPassword());
-
-      var filename = readlineSync.question('Where do you want to save the encrypted private key? ');
-      fs.writeFileSync(filename, cipherText);
-   }
-
-   console.log('Imported Ethereum address: ' + account.address);
-}
-else if (program.keyFile)
-{
-   if(program.export && !readlineSync.keyInYNStrict('Outputting your private key unencrypted can be dangerous. Are you sure you want to continue?'))
-   {
-      process.exit(0);
-   }
-
-   var data = fs.readFileSync(program.keyFile, 'utf8');
-   account = w3.eth.accounts.privateKeyToAccount(decrypt(data, enterPassword()));
+   var data = fs.readFileSync(keyFile, 'utf8');
+   account = w3.eth.accounts.privateKeyToAccount(decrypt(data, pass));
 
    console.log('Decrypted Ethereum address: ' + account.address);
-
-   if(program.export)
-   {
-      console.log(account.privateKey);
-      process.exit(0);
-   }
 }
-else
-{
-   if(!readlineSync.keyInYNStrict('No private key file specified. Do you want to create a new key?'))
-   {
-      process.exit(0);
-   }
 
-   var seed = readlineSync.question('Enter seed for entropy: ', {hideEchoBack: true, mask: ''});
-   account = w3.eth.accounts.create(crypto.createHmac('sha256', seed).digest('hex'));
-
-   var cipherText = encrypt(account.privateKey, enterPassword());
-
-   var filename = readlineSync.question('Where do you want to save the encrypted private key? ');
-   fs.writeFileSync(filename, cipherText);
-
-   console.log('Created new Ethereum address: ' + account.address);
-}
 
 var miner = new KoinosMiner(
-   program.addr,
+   addr,
    tip_addresses,
    account.address,
    contract_address,
-   program.endpoint,
-   program.tip,
-   program.proofPeriod,
-   program.gasMultiplier,
-   program.gasPriceLimit,
+   endpoint,
+   tip,
+   proofPeriod,
+   gasMultiplier,
+   gasPriceLimit,
    signCallback,
    hashrateCallback,
    proofCallback,
