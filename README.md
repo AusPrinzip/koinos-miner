@@ -4,16 +4,17 @@
 [![GitHub License](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://github.com/open-orchard/koinos-miner/blob/master/LICENSE.md)
 
 ## Environmental Variables
-Just create na .env file and all these variables:
+Just create an .env file in your root directory and add the following variables:
   - ADDRESS
   - ENDPOINT
   - TIP
-  - KEYFILE=encrypted
+  - KEYFILE
   - PASS
   - PROOFPERIOD
   - GASMULTIPLIER
   - GASPRICELIMIT
 
+NOTE: Please make sure to ignore this ".env" file in your .gitgnore.
 
 ## Table of Contents
   - [Dependencies](#dependencies)
