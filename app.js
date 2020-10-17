@@ -1,34 +1,17 @@
 'use strict';
 
-// const { program } = require('commander');
-require('dotenv').config()
-
-// program
-//    .version('1.0.0', '-v, --version')
-//    .usage('[OPTIONS]...')
-//    .requiredOption('-a, --addr <addr>', 'An ethereum address')
-//    .option('-e, --endpoint <endpoint>', 'An ethereum endpoint', 'wss://ropsten-rpc.linkpool.io/ws')
-//    .option('-t, --tip <percent>', 'The percentage of mined coins to tip the developers', '5')
-//    .option('-p, --proof-period <seconds>', 'How often you want to submit a proof on average', '86400')
-//    .option('-k, --key-file <file>', 'AES encrypted file containing private key')
-//    .option('-m, --gas-multiplier <multiplier>', 'The multiplier to apply to the recommended gas price', '1')
-//    .option('-l, --gas-price-limit <limit>', 'The maximum amount of gas to be spent on a proof submission', '1000000000000')
-//    .option('--import', 'Import a private key')
-//    .option('--export', 'Export a private key')
-//    .parse(process.argv);
-
+require('dotenv').config();
 
 const addr = process.env.ADDRESS;
 const endpoint = process.env.ENDPOINT;
 const tip = process.env.TIP;
 const proofPeriod = process.env.PROOFPERIOD;
-// const hashrate = process.env.hashrate;
 const keyFile = process.env.KEYFILE;
 const pass = process.env.PASS;
 const gasPriceLimit = process.env.GASPRICELIMIT;
 const gasMultiplier = process.env.GASMULTIPLIER;
 
-if (!proofPeriod || !addr || !endpoint || !keyFile || !pass || !tip) throw new Error('missing env var');
+if (!gasMultiplier || !gasPriceLimit || !proofPeriod || !addr || !endpoint || !keyFile || !pass || !tip) throw new Error('missing env var');
 
 console.log(` _  __     _                   __  __ _`);
 console.log(`| |/ /    (_)                 |  \\/  (_)`);
