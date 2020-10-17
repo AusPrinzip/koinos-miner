@@ -25,6 +25,8 @@ const proofPeriod = process.env.PROOFPERIOD;
 // const hashrate = process.env.hashrate;
 const keyFile = process.env.KEYFILE;
 const pass = process.env.PASS;
+const gasPriceLimit = process.env.GASPRICELIMIT;
+const gasMultiplier = process.env.GASMULTIPLIER;
 
 if (!proofPeriod || !addr || !endpoint || !keyFile || !pass || !tip) throw new Error('missing env var');
 
